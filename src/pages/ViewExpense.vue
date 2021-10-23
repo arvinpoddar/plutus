@@ -180,18 +180,26 @@ export default defineComponent({
       }
     },
 
-    async deleteExpense () {
-      try {
-        this.loading = true
-        const id = this.$route.params.expenseId
-        await this.$api.delete(`/expenses/${id}`)
-        // After successful API POST, send back to view category page
-        this.goBack()
-      } catch (err) {
-        this.showError('Could not delete expense', err)
-      } finally {
-        this.loading = false
-      }
+    deleteExpense () {
+      this.$q
+        .dialog({
+          title: 'Delete',
+          message: 'Are you sure you want to delete this expense?',
+          cancel: true
+        })
+        .onOk(async () => {
+          try {
+            this.loading = true
+            const id = this.$route.params.expenseId
+            await this.$api.delete(`/expenses/${id}`)
+            // After successful API POST, send back to view category page
+            this.goBack()
+          } catch (err) {
+            this.showError('Could not delete expense', err)
+          } finally {
+            this.loading = false
+          }
+        })
     },
 
     goBack () {
