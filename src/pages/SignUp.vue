@@ -31,7 +31,8 @@
             label="Sign Up"
             color="primary"
             text-color="white"
-            to="/login"
+            :loading="loading"
+            @click="createAccount"
           />
         </q-form>
       </div>
@@ -41,15 +42,53 @@
 
 <script>
 import { defineComponent } from 'vue'
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  setPersistence,
+  browserLocalPersistence
+} from 'firebase/auth'
+import notify from 'src/components/mixins/notify'
+import { API_URL } from 'src/parameters'
+
+// eslint-disable-next-line no-unused-vars
+import fb from 'src/firebaseConfig'
 
 export default defineComponent({
-  name: 'PageLogin',
+  name: 'PageSignUp',
+  mixins: [notify],
   data () {
     return {
       first_name: '',
       last_name: '',
       email: '',
-      password: ''
+      password: '',
+      loading: false
+    }
+  },
+  methods: {
+    createAccount () {
+      const app = this
+      app.loading = true
+      const auth = getAuth()
+      setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+          createUserWithEmailAndPassword(auth, app.email, app.password)
+            .then(async (user) => {
+              await this.$api.post()
+              app.loading = false
+              app.$api.defaults.baseURL = `${API_URL}/users/${user.user.uid}/`
+              app.$router.push('/accept-notifications')
+            })
+            .catch((err) => {
+              app.loading = false
+              app.showError('Could not create your account', err)
+            })
+        })
+        .catch((error) => {
+          app.loading = false
+          app.showError('Could not create an account', error)
+        })
     }
   }
 })

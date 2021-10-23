@@ -23,7 +23,7 @@
           label="Got it!"
           color="white"
           text-color="primary"
-          to="/login"
+          to="/onboard-categories"
         />
       </div>
     </div>

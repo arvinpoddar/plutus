@@ -50,6 +50,7 @@ import {
   setPersistence,
   browserLocalPersistence
 } from 'firebase/auth'
+import { API_URL } from 'src/parameters'
 
 // eslint-disable-next-line no-unused-vars
 import fb from 'src/firebaseConfig'
@@ -74,7 +75,7 @@ export default defineComponent({
           signInWithEmailAndPassword(auth, app.email, app.password)
             .then((user) => {
               app.loading = false
-              this.$api.defaults.baseURL += `users/${user.user.uid}/`
+              this.$api.defaults.baseURL = `${API_URL}/users/${user.user.uid}/`
             })
             .catch((err) => {
               console.log(err)

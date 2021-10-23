@@ -1,6 +1,7 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
+import { API_URL } from 'src/parameters'
 // eslint-disable-next-line no-unused-vars
 import fb from 'src/firebaseConfig'
 
@@ -10,7 +11,6 @@ import fb from 'src/firebaseConfig'
 // good idea to move this instance creation inside of the
 // "export default () => {}" function below (which runs individually
 // for each client)
-const BASE_URL = 'https://api-apollo-plutus.herokuapp.com/'
 
 const getUser = () => {
   return new Promise((resolve) => {
@@ -21,7 +21,7 @@ const getUser = () => {
   })
 }
 
-const api = axios.create({ baseURL: BASE_URL })
+const api = axios.create({ baseURL: API_URL })
 
 export default boot(async ({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
@@ -32,7 +32,7 @@ export default boot(async ({ app }) => {
 
   const user = await getUser()
   if (user) {
-    api.defaults.baseURL += `users/${user.uid}/`
+    api.defaults.baseURL = `${API_URL}/users/${user.uid}/`
   }
 
   app.config.globalProperties.$api = api
