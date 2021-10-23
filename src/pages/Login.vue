@@ -33,6 +33,7 @@
             label="Log In"
             color="primary"
             text-color="white"
+            :loading="loading"
             type="submit"
           />
         </q-form>
@@ -57,8 +58,8 @@ export default defineComponent({
   mixins: [notify],
   data () {
     return {
-      email: 'plutus@apollo.com',
-      password: 'apollo',
+      email: '',
+      password: '',
       loading: false
     }
   },
@@ -73,6 +74,7 @@ export default defineComponent({
             .then((user) => {
               app.loading = false
               this.$api.defaults.baseURL = `${API_URL}/users/${user.user.uid}/`
+              this.$router.push('/')
             })
             .catch((err) => {
               console.log(err)

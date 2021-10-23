@@ -6,7 +6,7 @@
     >
       <div class="row q-mb-md">
         <div class="col header">Home</div>
-        <q-btn icon="pl:icon-list" color="black" flat dense />
+        <q-btn icon="logout" color="black" flat dense @click="logout" />
       </div>
 
       <!-- CATEGORIES LIST -->
@@ -37,6 +37,7 @@
 import { defineComponent } from 'vue'
 import notify from 'src/components/mixins/notify'
 import format from 'src/components/mixins/format'
+import { getAuth, signOut } from 'firebase/auth'
 
 export default defineComponent({
   name: 'PageDashboard',
@@ -60,6 +61,17 @@ export default defineComponent({
 
     viewCategory (id) {
       this.$router.push(`/category/${id}`)
+    },
+
+    logout () {
+      const auth = getAuth()
+      signOut(auth)
+        .then(() => {
+          this.$router.push('/home')
+        })
+        .catch((error) => {
+          this.showError('Could not logout', error)
+        })
     }
   },
 
