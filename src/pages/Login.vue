@@ -52,9 +52,6 @@ import {
 } from 'firebase/auth'
 import { API_URL } from 'src/parameters'
 
-// eslint-disable-next-line no-unused-vars
-import fb from 'src/firebaseConfig'
-
 export default defineComponent({
   name: 'PageLogin',
   mixins: [notify],

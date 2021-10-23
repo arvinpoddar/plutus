@@ -2,8 +2,6 @@ import { boot } from 'quasar/wrappers'
 import axios from 'axios'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { API_URL } from 'src/parameters'
-// eslint-disable-next-line no-unused-vars
-import fb from 'src/firebaseConfig'
 
 // Be careful when using SSR for cross-request state pollution
 // due to creating a Singleton instance here;

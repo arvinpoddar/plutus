@@ -51,9 +51,6 @@ import {
 import notify from 'src/components/mixins/notify'
 import { API_URL } from 'src/parameters'
 
-// eslint-disable-next-line no-unused-vars
-import fb from 'src/firebaseConfig'
-
 export default defineComponent({
   name: 'PageSignUp',
   mixins: [notify],
@@ -75,9 +72,9 @@ export default defineComponent({
         .then(() => {
           createUserWithEmailAndPassword(auth, app.email, app.password)
             .then(async (user) => {
-              await this.$api.post()
+              await this.$api.post(`/users/${user.user.uid}/`)
               app.loading = false
-              app.$api.defaults.baseURL = `${API_URL}/users/${user.user.uid}/`
+              this.$api.defaults.baseURL = `${API_URL}/users/${user.user.uid}/`
               app.$router.push('/accept-notifications')
             })
             .catch((err) => {

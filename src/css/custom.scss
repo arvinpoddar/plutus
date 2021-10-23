@@ -82,6 +82,7 @@
   outline: none;
   box-sizing: border-box;
   border: 2px solid #e2e2ea;
+  background-color: transparent;
   transition: 0.25s;
 }
 .pl-raw-input:focus,
@@ -105,13 +106,13 @@
 }
 
 .pl-select {
-  height: 50px;
+  //height: 50px;
   .q-field__native,
   .q-field__control,
   .q-field--auto-height,
   .q-field__append,
   .q-field__marginal {
-    height: 50px;
+    //height: 50px;
     min-height: auto !important;
   }
 
@@ -252,4 +253,13 @@
 // Resolve strange darkening bug when any dialog is opened
 .q-body--prevent-scroll {
   position: unset !important;
+}
+
+.fixed-controls {
+  background-color: #fff;
+  border-top: 2px solid #f1f1f5;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  padding: 20px;
 }

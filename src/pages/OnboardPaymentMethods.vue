@@ -21,7 +21,7 @@
         <EmptyCard v-if="!methods.length" message="No payment methods!" />
       </div>
     </div>
-    <div class="input-controls">
+    <div class="fixed-controls">
       <div class="row q-gutter-x-md q-mb-md">
         <PLFieldInput
           v-model="newMethod"

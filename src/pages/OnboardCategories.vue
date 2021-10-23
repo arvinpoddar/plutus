@@ -20,7 +20,7 @@
         <EmptyCard v-if="!categories.length" message="No categories!" />
       </div>
     </div>
-    <div class="input-controls">
+    <div class="fixed-controls">
       <div class="row q-gutter-x-md q-mb-md">
         <PLFieldInput
           v-model="newCategory"
@@ -122,15 +122,6 @@ export default defineComponent({
     font-size: 16px;
     line-height: 24px;
     color: #92929d;
-  }
-
-  .input-controls {
-    background-color: #fff;
-    border-top: 2px solid #f1f1f5;
-    width: 100%;
-    position: fixed;
-    bottom: 0;
-    padding: 20px;
   }
 }
 </style>

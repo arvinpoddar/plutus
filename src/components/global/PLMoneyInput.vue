@@ -1,5 +1,5 @@
 <template>
-  <div class="ig-stack-input">
+  <div class="pl-stack-input">
     <div class="row items-center sl-label" v-if="field">
       <div class="col">{{ field }}</div>
       <slot name="label"></slot>
@@ -8,7 +8,7 @@
       ref="inputRef"
       :value="formattedValue"
       :class="{
-        'ig-input ig-raw-input': true,
+        'pl-input pl-raw-input': true,
         'sl-input': !!field,
       }"
     />

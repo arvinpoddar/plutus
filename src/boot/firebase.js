@@ -1,3 +1,4 @@
+import { boot } from 'quasar/wrappers'
 import { initializeApp } from 'firebase/app'
 import 'firebase/auth'
 
@@ -10,5 +11,8 @@ const firebaseConfig = {
   appId: '1:145591051590:web:ba6dc342489c059cfcf147'
 }
 
-const app = initializeApp(firebaseConfig)
-export default app
+const fb = initializeApp(firebaseConfig)
+
+export default boot(({ app }) => {
+  app.config.globalProperties.$fb = fb
+})

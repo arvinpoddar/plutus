@@ -1,5 +1,5 @@
 <template>
-  <div class="ig-stack-input">
+  <div class="pl-stack-input">
     <div class="row items-center sl-label">
       <div class="col">{{ field }}</div>
       <slot name="label"></slot>
@@ -11,7 +11,7 @@
       mask="##/##/####"
       fill-mask="-"
       :class="{
-        'ig-input': true,
+        'pl-input': true,
         'sl-input': !!field,
       }"
       outlined
