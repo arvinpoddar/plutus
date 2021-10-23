@@ -26,22 +26,31 @@
 
       <PLFieldInput v-model="search" placeholder="Search..." class="q-mb-sm" />
 
-      <div
+      <q-slide-item
         v-for="expense in category.expenses"
         :key="expense.id"
-        class="row pl-card expense-card"
+        @right="deleteExpense(expense.id)"
         @click="viewExpense(expense.id)"
+        right-color="negative"
+        class="pl-card q-mb-md"
+        :ref="expense.id"
       >
-        <div class="col ellipsis">
-          <div class="expense-name">{{ expense.name }}</div>
-          <div class="expense-date">
-            {{ formatDate(expense.date, "MM/DD/YYYY") }}
+        <template v-slot:right>
+          <q-icon name="pl:icon-trash" />
+        </template>
+        <q-item class="row expense-card">
+          <div class="col ellipsis">
+            <div class="expense-name">{{ expense.name }}</div>
+            <div class="expense-date">
+              {{ formatDate(expense.date, "MM/DD/YYYY") }}
+            </div>
           </div>
-        </div>
-        <div class="expense-price">
-          {{ formatAmount(expense.price, "dollar") }}
-        </div>
-      </div>
+          <div class="expense-price">
+            {{ formatAmount(expense.price, "dollar") }}
+          </div>
+        </q-item>
+      </q-slide-item>
+
       <EmptyCard v-if="!category.expenses.length" message="No expenses!" />
     </div>
     <div class="fixed-controls">
@@ -96,6 +105,31 @@ export default defineComponent({
 
     viewExpense (id) {
       this.$router.push(`/expense/${id}/`)
+    },
+
+    deleteExpense (id) {
+      // Internal function for resetting the state of a slide item
+      const reset = () => {
+        if (this.$refs[id] && this.$refs[id].reset) {
+          this.$refs[id].reset()
+        }
+      }
+
+      this.$q
+        .dialog({
+          title: 'Delete',
+          message: 'Are you sure you want to delete this expense?',
+          cancel: true
+        })
+        .onOk(async () => {
+          try {
+            await this.$api.delete(`/expenses/${id}`)
+            await this.getCategory()
+          } catch (err) {
+            this.showError('Could not delete expense', err)
+          }
+        })
+        .onDismiss(() => reset())
     }
   },
 
@@ -116,7 +150,6 @@ export default defineComponent({
   .expense-card {
     padding: 12px;
     cursor: pointer;
-    margin-bottom: 16px;
     font-weight: 500;
 
     .expense-name,
