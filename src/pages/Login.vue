@@ -77,9 +77,18 @@ export default defineComponent({
               this.$router.push('/')
             })
             .catch((err) => {
-              console.log(err)
+              console.log(err.message)
               app.loading = false
-              app.showError('Could not sign in', err)
+              if (err.code === 'auth/too-many-requests') {
+                app.showError('Your account has been temporarily locked', err)
+              } else if (
+                err.code === 'auth/auth/user-not-found' ||
+                err.code === 'auth/wrong-password'
+              ) {
+                app.showError('Incorrect username or password', err)
+              } else {
+                app.showError('Could not sign in', err)
+              }
             })
         })
         .catch((err) => {
