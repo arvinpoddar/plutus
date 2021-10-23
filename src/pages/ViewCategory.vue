@@ -30,6 +30,7 @@
         v-for="expense in category.expenses"
         :key="expense.id"
         class="row pl-card expense-card"
+        @click="viewExpense(expense.id)"
       >
         <div class="col ellipsis">
           <div class="expense-name">{{ expense.name }}</div>
@@ -91,6 +92,10 @@ export default defineComponent({
     addExpense () {
       const id = this.$route.params.categoryId
       this.$router.push(`/category/${id}/add-expense`)
+    },
+
+    viewExpense (id) {
+      this.$router.push(`/expense/${id}/`)
     }
   },
 

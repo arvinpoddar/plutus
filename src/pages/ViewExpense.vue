@@ -14,20 +14,19 @@
           style="margin-left: -20px"
           @click="goBack"
         />
-        <div class="col ellipsis header">Add Expense</div>
+        <input class="col ellipsis header ghost-input" v-model="expense.name" />
       </div>
 
       <div class="q-gutter-y-md">
-        <PLFieldInput v-model="res.name" field="Name" />
-        <PLFieldInput v-model="res.description" field="Description" />
+        <PLFieldInput v-model="expense.description" field="Description" />
         <div class="row items-center q-gutter-x-md">
           <PLFieldInput
-            v-model="res.date"
+            v-model="expense.date"
             field="Date"
             type="date"
             class="col"
           />
-          <PLMoneyInput v-model="res.price" field="Price" class="col" />
+          <PLMoneyInput v-model="expense.price" field="Price" class="col" />
         </div>
 
         <!-- SELECT CATEGORIES -->
@@ -35,7 +34,7 @@
           <div class="sl-label">Categories</div>
           <q-select
             outlined
-            v-model="res.categories"
+            v-model="categoryBuffer"
             multiple
             :options="categoryOptions"
             use-chips
@@ -70,7 +69,7 @@
         <div class="pl-stack-input">
           <div class="sl-label">Payment method</div>
           <select
-            v-model="res.payment_method"
+            v-model="expense.payment_method"
             class="pl-n-select sl-input"
             required
           >
@@ -86,14 +85,24 @@
       </div>
     </div>
     <div class="fixed-controls">
-      <q-btn
-        class="pl-btn full-width q-mb-md"
-        label="Save"
-        color="primary"
-        text-color="white"
-        :loading="loading"
-        @click="saveExpense"
-      />
+      <div class="row items-center q-mb-md q-gutter-x-md">
+        <q-btn
+          class="pl-btn"
+          label="Delete"
+          color="negative"
+          text-color="white"
+          :loading="loading"
+          @click="deleteExpense"
+        />
+        <q-btn
+          class="pl-btn col"
+          label="Save"
+          color="primary"
+          text-color="white"
+          :loading="loading"
+          @click="saveExpense"
+        />
+      </div>
     </div>
   </q-page>
 </template>
@@ -102,13 +111,14 @@
 import { defineComponent } from 'vue'
 import dayjs from 'dayjs'
 import notify from 'src/components/mixins/notify'
+import format from 'src/components/mixins/format'
 
 export default defineComponent({
-  name: 'PageViewCategory',
-  mixins: [notify],
+  name: 'PageViewExpense',
+  mixins: [notify, format],
   data () {
     return {
-      res: {
+      expense: {
         name: '',
         description: '',
         date: dayjs().format('YYYY-MM-DD'),
@@ -116,8 +126,12 @@ export default defineComponent({
         categories: [],
         payment_method: ''
       },
+
+      categoryBuffer: [],
+
       categoryOptions: [],
       methodOptions: [],
+
       loading: false
     }
   },
@@ -125,15 +139,7 @@ export default defineComponent({
     async getOptions () {
       try {
         // Fetch all categories and automatically add the current one (if it is valid)
-        const id = this.$route.params.categoryId
         this.categoryOptions = (await this.$api.get('/categories')).data
-        const currentCategory = this.categoryOptions.find(
-          (cat) => cat.id === id
-        )
-        if (currentCategory) {
-          this.res.categories.push(currentCategory)
-        }
-
         // Fetch all payment methods
         this.methodOptions = (await this.$api.get('/payment-methods')).data
       } catch (err) {
@@ -141,23 +147,48 @@ export default defineComponent({
       }
     },
 
+    async getExpense () {
+      try {
+        // Fetch current expense
+        const id = this.$route.params.expenseId
+        this.expense = (await this.$api.get(`/expenses/${id}`)).data
+        this.expense.date = this.formatDate(this.expense.date, 'YYYY-MM-DD')
+        this.categoryBuffer = this.expense.categories.map((cat) => {
+          return this.categoryOptions.find((obj) => obj.id === cat)
+        })
+      } catch (err) {
+        this.showError('Could not fetch expense', err)
+      }
+    },
+
     async saveExpense () {
       try {
         this.loading = true
-        const selectedCategories = this.res.categories.map((cat) => cat.id)
+        const selectedCategories = this.categoryBuffer.map((cat) => cat.id)
         const body = {
-          ...this.res,
-          date: dayjs(this.res.date).toISOString(),
-          categories: selectedCategories,
-          images: []
+          ...this.expense,
+          date: dayjs(this.expense.date).toISOString(),
+          categories: selectedCategories
         }
-        await this.$api.post('/expenses/', body)
-
-        // After successful API POST, send back to category page
-        const id = this.$route.params.categoryId
-        this.$router.push(`/category/${id}`)
+        const id = this.$route.params.expenseId
+        await this.$api.put(`/expenses/${id}`, body)
+        this.goBack()
       } catch (err) {
-        this.showError('Could not add expense', err)
+        this.showError('Could not save expense', err)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async deleteExpense () {
+      try {
+        this.loading = true
+        const id = this.$route.params.expenseId
+        await this.$api.delete(`/expenses/${id}`)
+        // After successful API POST, send back to view category page
+        this.goBack()
+      } catch (err) {
+        this.showError('Could not delete expense', err)
       } finally {
         this.loading = false
       }
@@ -168,8 +199,9 @@ export default defineComponent({
     }
   },
 
-  mounted () {
-    this.getOptions()
+  async mounted () {
+    await this.getOptions()
+    await this.getExpense()
   }
 })
 </script>
@@ -180,6 +212,14 @@ export default defineComponent({
     font-weight: bold;
     font-size: 24px;
     line-height: 54px;
+  }
+
+  .ghost-input {
+    background-color: transparent;
+    border: 0px;
+    outline: 0px;
+    margin: 0px;
+    padding: 0px;
   }
 
   .category-card {
