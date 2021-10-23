@@ -1,109 +1,121 @@
 <template>
   <q-page class="category-layout">
-    <div
-      class="q-px-lg q-py-xl flex column full-width"
-      style="min-height: 100vh"
-    >
-      <div class="row q-mb-md">
-        <q-btn
-          icon="pl:icon-chevron-left"
-          color="grey"
-          size="lg"
-          flat
-          dense
-          style="margin-left: -20px"
-          @click="goBack"
-        />
-        <input class="col ellipsis header ghost-input" v-model="expense.name" />
-      </div>
-
-      <div class="q-gutter-y-md">
-        <PLFieldInput v-model="expense.description" field="Description" />
-        <div class="row items-center q-gutter-x-md">
-          <PLFieldInput
-            v-model="expense.date"
-            field="Date"
-            type="date"
-            class="col"
+    <q-form @submit="saveExpense">
+      <div
+        class="q-px-lg q-py-xl flex column full-width"
+        style="min-height: 100vh"
+      >
+        <div class="row q-mb-md">
+          <q-btn
+            icon="pl:icon-chevron-left"
+            color="grey"
+            size="lg"
+            flat
+            dense
+            style="margin-left: -20px"
+            @click="goBack"
           />
-          <PLMoneyInput v-model="expense.price" field="Price" class="col" />
-        </div>
-
-        <!-- SELECT CATEGORIES -->
-        <div class="pl-stack-input">
-          <div class="sl-label">Categories</div>
-          <q-select
-            outlined
-            v-model="categoryBuffer"
-            multiple
-            :options="categoryOptions"
-            use-chips
-            stack-label
-            class="pl-select sl-input"
-          >
-            <template v-slot:selected-item="scope">
-              <q-chip
-                removable
-                dense
-                @remove="scope.removeAtIndex(scope.index)"
-                :tabindex="scope.tabindex"
-                color="primary"
-                text-color="white"
-                class="q-ma-xs f-med"
-                style="font-size: 12px"
-              >
-                {{ scope.opt.name }}
-              </q-chip>
-            </template>
-            <template v-slot:option="scope">
-              <q-item v-bind="scope.itemProps">
-                <q-item-section>
-                  <q-item-label>{{ scope.opt.name }}</q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-          </q-select>
-        </div>
-
-        <!-- SELECT PAYMENT METHOD -->
-        <div class="pl-stack-input">
-          <div class="sl-label">Payment method</div>
-          <select
-            v-model="expense.payment_method"
-            class="pl-n-select sl-input"
+          <input
+            class="col ellipsis header ghost-input"
+            v-model="expense.name"
             required
-          >
-            <option
-              v-for="method in methodOptions"
-              :key="method.id"
-              :value="method.id"
+          />
+        </div>
+
+        <div class="q-gutter-y-md">
+          <PLFieldInput v-model="expense.description" field="Description" />
+          <div class="row items-center q-gutter-x-md">
+            <PLFieldInput
+              v-model="expense.date"
+              field="Date"
+              type="date"
+              class="col"
+            />
+            <PLMoneyInput
+              v-model="expense.price"
+              field="Price"
+              class="col"
+              required
+            />
+          </div>
+
+          <!-- SELECT CATEGORIES -->
+          <div class="pl-stack-input">
+            <div class="sl-label">Categories</div>
+            <q-select
+              outlined
+              v-model="categoryBuffer"
+              multiple
+              :options="categoryOptions"
+              use-chips
+              stack-label
+              class="pl-select sl-input"
+              required
             >
-              {{ method.name }}
-            </option>
-          </select>
+              <template v-slot:selected-item="scope">
+                <q-chip
+                  removable
+                  dense
+                  @remove="scope.removeAtIndex(scope.index)"
+                  :tabindex="scope.tabindex"
+                  color="primary"
+                  text-color="white"
+                  class="q-ma-xs f-med"
+                  style="font-size: 12px"
+                >
+                  {{ scope.opt.name }}
+                </q-chip>
+              </template>
+              <template v-slot:option="scope">
+                <q-item v-bind="scope.itemProps">
+                  <q-item-section>
+                    <q-item-label>{{ scope.opt.name }}</q-item-label>
+                  </q-item-section>
+                </q-item>
+              </template>
+            </q-select>
+          </div>
+
+          <!-- SELECT PAYMENT METHOD -->
+          <div class="pl-stack-input">
+            <div class="sl-label">Payment method</div>
+            <select
+              v-model="expense.payment_method"
+              class="pl-n-select sl-input"
+              required
+            >
+              <option
+                v-for="method in methodOptions"
+                :key="method.id"
+                :value="method.id"
+              >
+                {{ method.name }}
+              </option>
+            </select>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="fixed-controls">
-      <div class="row items-center q-mb-md q-gutter-x-md">
-        <q-btn
-          class="pl-btn"
-          label="Delete"
-          color="negative"
-          text-color="white"
-          :loading="loading"
-          @click="deleteExpense"
-        />
-        <q-btn
-          class="pl-btn col"
-          label="Save"
-          color="primary"
-          text-color="white"
-          :loading="loading"
-          @click="saveExpense"
-        />
+      <div class="fixed-controls">
+        <div class="row items-center q-mb-md q-gutter-x-md">
+          <q-btn
+            class="pl-btn"
+            label="Delete"
+            color="negative"
+            text-color="white"
+            :loading="loading"
+            @click="deleteExpense"
+          />
+          <q-btn
+            class="pl-btn col"
+            label="Save"
+            color="primary"
+            text-color="white"
+            :loading="loading"
+            type="submit"
+          />
+        </div>
       </div>
-    </div>
+    </q-form>
   </q-page>
 </template>
 
@@ -165,6 +177,9 @@ export default defineComponent({
       try {
         this.loading = true
         const selectedCategories = this.categoryBuffer.map((cat) => cat.id)
+        if (!selectedCategories.length) {
+          return this.showError('Add a category for your expense', null)
+        }
         const body = {
           ...this.expense,
           date: dayjs(this.expense.date).toISOString(),
