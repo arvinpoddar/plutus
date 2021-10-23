@@ -6,8 +6,12 @@ export const notify = {
       }
       this.$q.notify({
         type: 'positive',
+        progress: true,
         message: message,
-        position: 'top'
+        position: 'top',
+        timeout: 1500,
+        classes: 'pl-notification',
+        actions: [{ icon: 'close', color: 'white' }]
       })
     },
 
@@ -17,8 +21,12 @@ export const notify = {
       }
       this.$q.notify({
         type: 'negative',
+        progress: true,
         message: message,
-        position: 'top'
+        position: 'top',
+        timeout: 1500,
+        classes: 'pl-notification',
+        actions: [{ icon: 'close', color: 'white' }]
       })
     }
   }
