@@ -125,7 +125,7 @@ const routes = [
     name: 'viewExpense',
     component: () => import('layouts/CleanLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/OnboardPaymentMethods.vue') }
+      { path: '', component: () => import('pages/ViewExpense.vue') }
     ],
     meta: {
       requiresAuth: true

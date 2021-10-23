@@ -38,6 +38,7 @@ import { defineComponent } from 'vue'
 import notify from 'src/components/mixins/notify'
 import format from 'src/components/mixins/format'
 import { getAuth, signOut } from 'firebase/auth'
+import { API_URL } from 'src/parameters'
 
 export default defineComponent({
   name: 'PageDashboard',
@@ -67,6 +68,8 @@ export default defineComponent({
       const auth = getAuth()
       signOut(auth)
         .then(() => {
+          // RESET BASE URL AND GO HOME
+          this.$api.defaults.baseURL = API_URL
           this.$router.push('/home')
         })
         .catch((error) => {
