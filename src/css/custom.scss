@@ -211,19 +211,9 @@
 }
 
 .pl-card {
-  border-radius: 20px !important;
-  background-color: #fff !important;
-  border: 1px solid #e2e2ea;
-
-  .pl-card-title {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid #e2e2ea;
-    font-size: 18px;
-    font-weight: 600;
-    height: 78px;
-    padding: 0px 25px;
-  }
+  background: #ffffff;
+  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
 }
 
 .pl-stack-input {
@@ -237,12 +227,6 @@
     margin-bottom: 3px;
     display: flex;
   }
-}
-
-.pl-drawer-page {
-  max-width: 1200px;
-  padding: 28px;
-  margin: 0 auto;
 }
 
 .pl-min-width {
