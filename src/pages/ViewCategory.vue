@@ -32,7 +32,7 @@
         @right="deleteExpense(expense.id)"
         @click="viewExpense(expense.id)"
         right-color="negative"
-        class="pl-card q-mb-md"
+        class="pl-card q-mb-md cursor-pointer"
         :ref="expense.id"
       >
         <template v-slot:right>

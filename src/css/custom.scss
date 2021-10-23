@@ -84,6 +84,9 @@
   border: 2px solid #e2e2ea;
   background-color: transparent;
   transition: 0.25s;
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
 }
 .pl-raw-input:focus,
 .pl-raw-input:active {
