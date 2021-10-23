@@ -51,6 +51,7 @@
               stack-label
               class="pl-select sl-input"
               required
+              behavior="menu"
             >
               <template v-slot:selected-item="scope">
                 <q-chip
