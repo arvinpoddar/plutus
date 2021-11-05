@@ -27,7 +27,7 @@
       <PLFieldInput v-model="search" placeholder="Search..." class="q-mb-sm" />
 
       <q-slide-item
-        v-for="expense in category.expenses"
+        v-for="expense in searchResults"
         :key="expense.id"
         @right="deleteExpense(expense.id)"
         @click="viewExpense(expense.id)"
@@ -51,7 +51,7 @@
         </q-item>
       </q-slide-item>
 
-      <EmptyCard v-if="!category.expenses.length" message="No expenses!" />
+      <EmptyCard v-if="!searchResults.length" message="No expenses!" />
     </div>
     <div class="fixed-controls">
       <q-btn
@@ -82,6 +82,38 @@ export default defineComponent({
       },
 
       search: ''
+    }
+  },
+  computed: {
+    searchResults () {
+      // Return original results if search is empty
+      if (!this.search.trim()) {
+        return [...this.category.expenses]
+      }
+
+      // Split search queries into words
+      const searchQueries = this.search.split(' ')
+
+      // Filter the expense results
+      const results = this.category.expenses.filter((expense) => {
+        // Combine all words from expense name and description into a list (lower case)
+        let searchBody = (`${expense.name} ${expense.description}`)
+        searchBody = searchBody.toLowerCase().split(' ')
+
+        // Search all the words in the search body and see if any of them start
+        // with the current query word.
+        for (let query of searchQueries) {
+          query = query.trim()
+          for (let term of searchBody) {
+            term = term.trim()
+            if (query && term && term.startsWith(query.toLowerCase())) {
+              return true
+            }
+          }
+        }
+        return false
+      })
+      return results
     }
   },
   methods: {
