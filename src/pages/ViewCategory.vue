@@ -24,7 +24,36 @@
         </div>
       </div>
 
-      <PLFieldInput v-model="search" placeholder="Search..." class="q-mb-sm" />
+      <PLFieldInput v-model="search" placeholder="Search..." class="q-mb-sm">
+        <template v-slot:append>
+          <q-icon name="pl:icon-schedule" class="cursor-pointer">
+            <q-menu>
+              <q-list class="q-py-md" style="min-width: 100px">
+                <q-item>
+                  <q-item-section>
+                    From:
+                    <PLFieldInput type="date" v-model="startDate" />
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    To:
+                    <PLFieldInput type="date" v-model="endDate" />
+                  </q-item-section>
+                </q-item>
+                <div class="row justify-end">
+                  <q-btn
+                    label="Reset"
+                    color="negative"
+                    class="pl-btn q-mr-md q-mt-sm reset-button"
+                    @click="resetDateFilters"
+                  />
+                </div>
+              </q-list>
+            </q-menu>
+          </q-icon>
+        </template>
+      </PLFieldInput>
 
       <q-slide-item
         v-for="expense in searchResults"
@@ -81,7 +110,9 @@ export default defineComponent({
         total_expenses: 0
       },
 
-      search: ''
+      search: '',
+      startDate: '',
+      endDate: ''
     }
   },
   computed: {
@@ -97,7 +128,7 @@ export default defineComponent({
       // Filter the expense results
       const results = this.category.expenses.filter((expense) => {
         // Combine all words from expense name and description into a list (lower case)
-        let searchBody = (`${expense.name} ${expense.description}`)
+        let searchBody = `${expense.name} ${expense.description}`
         searchBody = searchBody.toLowerCase().split(' ')
 
         // Search all the words in the search body and see if any of them start
@@ -162,6 +193,11 @@ export default defineComponent({
           }
         })
         .onDismiss(() => reset())
+    },
+
+    resetDateFilters () {
+      this.startDate = ''
+      this.endDate = ''
     }
   },
 
@@ -194,5 +230,9 @@ export default defineComponent({
       color: #bebebe;
     }
   }
+}
+.reset-button {
+  padding: 0px 29px;
+  height: 30px;
 }
 </style>
