@@ -1,5 +1,5 @@
 <template>
-  <q-page class="category-layout">
+  <q-page class="category-layout fixed-layout">
     <q-form @submit="saveExpense">
       <div
         class="q-px-lg q-py-xl flex column full-width"
@@ -17,6 +17,12 @@
           />
           <div class="col ellipsis header">Add Expense</div>
         </div>
+
+        <ExpenseImages
+          :images="res.images"
+          @upload="addImageToExpense"
+          @delete="deleteImageFromExpense"
+        />
 
         <div class="q-gutter-y-md">
           <PLFieldInput v-model="res.name" field="Name" required />
@@ -112,9 +118,14 @@ import { defineComponent } from 'vue'
 import dayjs from 'dayjs'
 import notify from 'src/components/mixins/notify'
 
+import ExpenseImages from 'src/components/images/ExpenseImages'
+
 export default defineComponent({
   name: 'PageViewCategory',
   mixins: [notify],
+  components: {
+    ExpenseImages
+  },
   data () {
     return {
       res: {
@@ -123,7 +134,8 @@ export default defineComponent({
         date: dayjs().format('YYYY-MM-DD'),
         price: 0,
         categories: [],
-        payment_method: ''
+        payment_method: '',
+        images: []
       },
       categoryOptions: [],
       methodOptions: [],
@@ -160,8 +172,7 @@ export default defineComponent({
         const body = {
           ...this.res,
           date: dayjs(this.res.date).toISOString(),
-          categories: selectedCategories,
-          images: []
+          categories: selectedCategories
         }
         await this.$api.post('/expenses/', body)
 
@@ -177,6 +188,14 @@ export default defineComponent({
 
     goBack () {
       this.$router.go(-1)
+    },
+
+    addImageToExpense (url) {
+      this.res.images.push(url)
+    },
+
+    deleteImageFromExpense (url) {
+      this.res.images = this.res.images.filter((img) => img !== url)
     }
   },
 
