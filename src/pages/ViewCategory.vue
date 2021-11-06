@@ -1,6 +1,6 @@
 <template>
   <Loader v-if="loading" />
-  <q-page class="category-layout" v-else>
+  <q-page class="category-layout fixed-layout" v-else>
     <div
       class="q-px-lg q-py-xl flex column full-width"
       style="min-height: 100vh"
@@ -19,9 +19,12 @@
         <!--<q-btn icon="pl:icon-list" color="black" flat dense />-->
       </div>
 
-      <div class="pl-card q-pa-md q-mb-lg">
+      <div class="pl-card main-card q-mb-lg">
         <div class="text-h6 f-bold">
           Total: {{ numToDollar(totalExpenses) }}
+        </div>
+        <div class="chart-container" style="height: 200px">
+          <MainChart :expenses="category.expenses" />
         </div>
       </div>
 
@@ -101,9 +104,14 @@ import { defineComponent } from 'vue'
 import notify from 'src/components/mixins/notify'
 import format from 'src/components/mixins/format'
 
+import MainChart from 'src/components/chart/MainChart'
+
 export default defineComponent({
   name: 'PageViewCategory',
   mixins: [notify, format],
+  components: {
+    MainChart
+  },
   data () {
     return {
       category: {
@@ -241,6 +249,10 @@ export default defineComponent({
 
 <style lang="scss">
 .category-layout {
+  .main-card {
+    padding: 16px 16px 4px 16px;
+  }
+
   .header {
     font-weight: bold;
     font-size: 24px;

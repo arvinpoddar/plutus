@@ -1,5 +1,5 @@
 <template>
-  <q-page class="dashboard-layout">
+  <q-page class="dashboard-layout fixed-layout">
     <div
       class="q-px-lg q-py-xl flex column full-width"
       style="min-height: 100vh"
@@ -14,8 +14,11 @@
       <!-- CATEGORIES LIST -->
       <div v-else>
         <div class="row pl-card category-card" @click="viewCategory('')">
-          <div class="col ellipsis">All Expenses</div>
+          <div class="col ellipsis">Total</div>
           <div>{{ numToDollar(totalExpenses) }}</div>
+          <div class="chart-container" style="height: 125px">
+            <FlatChart :expenses="allExpenses" />
+          </div>
         </div>
 
         <q-separator inset class="q-my-lg" />
@@ -23,11 +26,16 @@
         <div
           v-for="cat in categories"
           :key="cat.id"
-          class="row pl-card category-card"
+          class="pl-card category-card"
           @click="viewCategory(cat.id)"
         >
-          <div class="col ellipsis">{{ cat.name }}</div>
-          <div>{{ numToDollar(cat.total_expenses) }}</div>
+          <div class="row">
+            <div class="col ellipsis">{{ cat.name }}</div>
+            <div>{{ numToDollar(cat.total_expenses) }}</div>
+          </div>
+          <div class="chart-container" style="height: 75px">
+            <FlatChart :expenses="cat.expenses" />
+          </div>
         </div>
 
         <EmptyCard v-if="!categories.length" message="No categories!" />
@@ -58,9 +66,14 @@ import format from 'src/components/mixins/format'
 import { getAuth, signOut } from 'firebase/auth'
 import { API_URL } from 'src/parameters'
 
+import FlatChart from 'src/components/chart/FlatChart'
+
 export default defineComponent({
   name: 'PageDashboard',
   mixins: [notify, format],
+  components: {
+    FlatChart
+  },
   data () {
     return {
       categories: [],
@@ -133,11 +146,15 @@ export default defineComponent({
   }
 
   .category-card {
-    padding: 12px;
+    padding: 12px 12px 0px 12px;
     cursor: pointer;
-    margin-bottom: 16px;
+    margin-bottom: 24px;
     font-size: 20px;
     font-weight: 600;
+
+    .chart-container {
+      width: 100%;
+    }
   }
 }
 </style>
