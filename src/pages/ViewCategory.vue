@@ -31,9 +31,20 @@
       <!-- SEARCH BAR -->
       <PLFieldInput v-model="search" placeholder="Search..." class="q-mb-sm">
         <template v-slot:append>
-          <q-icon name="pl:icon-schedule" class="cursor-pointer">
-            <q-menu>
-              <q-list class="q-py-md" style="min-width: 100px">
+          <q-icon name="pl:icon-schedule" class="cursor-pointer" @click="prompt = true">
+            <q-dialog v-model="prompt" persistent position="bottom">
+              <q-card style="min-width: 350px">
+                <q-card-section>
+                  <div class="q-pa-lg">
+                    <q-option-group
+                        v-model="dateChoice"
+                        :options="options"
+                        color="primary"
+                    />
+                </div>
+                </q-card-section>
+                <q-card-section v-if="dateChoice=== 'dateRange'" class="q-pt-none">
+                   <q-list v-if="dateChoice=== 'dateRange'" class="q-py-md" style="min-width: 100px">
                 <q-item>
                   <q-item-section>
                     From:
@@ -55,7 +66,45 @@
                   />
                 </div>
               </q-list>
-            </q-menu>
+                </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-icon name="close" v-close-popup size = "24px" />
+        </q-card-actions>
+      </q-card>
+            </q-dialog>
+            <!-- <q-menu>
+                  <div class="q-pa-lg">
+                    <q-option-group
+                        v-model="dateChoice"
+                        :options="options"
+                        color="primary"
+                    />
+                </div>
+              <q-list v-if="dateChoice=== 'dateRange'" class="q-py-md" style="min-width: 100px">
+                <q-item>
+                  <q-item-section>
+                    From:
+                    <PLFieldInput type="date" v-model="startDate" />
+                  </q-item-section>
+                </q-item>
+                <q-item>
+                  <q-item-section>
+                    To:
+                    <PLFieldInput type="date" v-model="endDate" />
+                  </q-item-section>
+                </q-item>
+                <div class="row justify-end">
+                  <q-btn
+                    label="Reset"
+                    color="negative"
+                    class="pl-btn q-mr-md q-mt-sm reset-button"
+                    @click="resetDateFilters"
+                  />
+                </div>
+              </q-list>
+            </q-menu> -->
+
           </q-icon>
         </template>
       </PLFieldInput>
@@ -100,7 +149,8 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue'
+import { defineComponent, ref } from 'vue'
+import { date } from 'quasar'
 import notify from 'src/components/mixins/notify'
 import format from 'src/components/mixins/format'
 
@@ -118,28 +168,91 @@ export default defineComponent({
         name: '',
         expenses: []
       },
+      options: [
+        {
+          label: 'Previous 7 days',
+          value: 'week'
+        },
+        {
+          label: 'This month',
+          value: 'month'
+        },
+        {
+          label: 'Date Range',
+          value: 'dateRange'
+        }
+      ],
+      prompt: ref(false),
 
       search: '',
       startDate: '',
       endDate: '',
+      dateChoice: '',
 
       loading: true
     }
   },
+  // setup () {
+  //   return {
+  //     group: this.ref('op1'),
+
+  //     options: [
+  //       {
+  //         label: 'Option 1',
+  //         value: 'op1'
+  //       },
+  //       {
+  //         label: 'Option 2',
+  //         value: 'op2'
+  //       },
+  //       {
+  //         label: 'Option 3',
+  //         value: 'op3'
+  //       }
+  //     ]
+  //   }
+  // },
   computed: {
     filteredByDate () {
       // Filter initial expense list by dates (if date filters are present)
+      if (this.dateChoice === 'dateRange') {
+        const minDate = this.startDate
+          ? new Date(this.startDate)
+          : new Date('1970-01-01')
+        const maxDate = this.endDate ? new Date(this.endDate) : new Date()
 
-      const minDate = this.startDate
-        ? new Date(this.startDate)
-        : new Date('1970-01-01')
-      const maxDate = this.endDate ? new Date(this.endDate) : new Date()
+        const expensesWithinDates = this.category.expenses.filter((expense) => {
+          const expenseDate = new Date(expense.date)
+          return expenseDate >= minDate && expenseDate <= maxDate
+        })
+        return expensesWithinDates
+      } else if (this.dateChoice === 'week') {
+        const maxDate = Date.now()
+        const minDate = date.subtractFromDate(maxDate, { days: 7 })
+        const expensesWithinDates = this.category.expenses.filter((expense) => {
+          const expenseDate = new Date(expense.date)
+          return expenseDate >= minDate && expenseDate <= maxDate
+        })
+        return expensesWithinDates
+      } else if (this.dateChoice === 'month') {
+        const currDate = Date.now()
+        const expensesWithinDates = this.category.expenses.filter((expense) => {
+          const expenseDate = new Date(expense.date)
+          return date.isSameDate(expenseDate, currDate, 'month')
+        })
+        return expensesWithinDates
+      }
 
-      const expensesWithinDates = this.category.expenses.filter((expense) => {
-        const expenseDate = new Date(expense.date)
-        return expenseDate >= minDate && expenseDate <= maxDate
-      })
-      return expensesWithinDates
+      // const minDate = this.startDate
+      //   ? new Date(this.startDate)
+      //   : new Date('1970-01-01')
+      // const maxDate = this.endDate ? new Date(this.endDate) : new Date()
+
+      // const expensesWithinDates = this.category.expenses.filter((expense) => {
+      //   const expenseDate = new Date(expense.date)
+      //   return expenseDate >= minDate && expenseDate <= maxDate
+      // })
+      return this.category.expenses
     },
 
     searchResults () {

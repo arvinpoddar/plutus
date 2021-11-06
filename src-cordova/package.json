@@ -25,5 +25,8 @@
     "platforms": [
       "ios"
     ]
+  },
+  "dependencies": {
+    "apexcharts": "^3.29.0"
   }
 }
