@@ -20,10 +20,11 @@
 
       <div class="pl-card q-pa-md q-mb-lg">
         <div class="text-h6 f-bold">
-          Total: {{ numToDollar(category.total_expenses) }}
+          Total: {{ numToDollar(totalExpenses) }}
         </div>
       </div>
 
+      <!-- SEARCH BAR -->
       <PLFieldInput v-model="search" placeholder="Search..." class="q-mb-sm">
         <template v-slot:append>
           <q-icon name="pl:icon-schedule" class="cursor-pointer">
@@ -57,7 +58,7 @@
 
       <q-slide-item
         v-for="expense in searchResults"
-        :key="expense.id"
+        :key="expense.id + startDate"
         @right="deleteExpense(expense.id)"
         @click="viewExpense(expense.id)"
         right-color="negative"
@@ -106,8 +107,7 @@ export default defineComponent({
     return {
       category: {
         name: '',
-        expenses: [],
-        total_expenses: 0
+        expenses: []
       },
 
       search: '',
@@ -116,17 +116,32 @@ export default defineComponent({
     }
   },
   computed: {
+    filteredByDate () {
+      // Filter initial expense list by dates (if date filters are present)
+
+      const minDate = this.startDate
+        ? new Date(this.startDate)
+        : new Date('1970-01-01')
+      const maxDate = this.endDate ? new Date(this.endDate) : new Date()
+
+      const expensesWithinDates = this.category.expenses.filter((expense) => {
+        const expenseDate = new Date(expense.date)
+        return expenseDate >= minDate && expenseDate <= maxDate
+      })
+      return expensesWithinDates
+    },
+
     searchResults () {
       // Return original results if search is empty
       if (!this.search.trim()) {
-        return [...this.category.expenses]
+        return [...this.filteredByDate]
       }
 
       // Split search queries into words
       const searchQueries = this.search.split(' ')
 
       // Filter the expense results
-      const results = this.category.expenses.filter((expense) => {
+      const results = this.filteredByDate.filter((expense) => {
         // Combine all words from expense name and description into a list (lower case)
         let searchBody = `${expense.name} ${expense.description}`
         searchBody = searchBody.toLowerCase().split(' ')
@@ -145,6 +160,14 @@ export default defineComponent({
         return false
       })
       return results
+    },
+
+    totalExpenses () {
+      let sum = 0
+      this.category.expenses.forEach((expense) => {
+        sum += expense.price
+      })
+      return sum
     }
   },
   methods: {
