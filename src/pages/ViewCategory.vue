@@ -178,8 +178,14 @@ export default defineComponent({
       try {
         this.loading = true
         const id = this.$route.params.categoryId
-        const data = (await this.$api.get(`/categories/${id}`)).data
-        this.category = Object.assign(this.category, data)
+        if (id) {
+          const data = (await this.$api.get(`/categories/${id}`)).data
+          this.category = Object.assign(this.category, data)
+        } else {
+          const expenses = (await this.$api.get('/expenses')).data
+          this.category.expenses = expenses
+          this.category.name = 'All Expenses'
+        }
       } catch (err) {
         this.showError('Could not fetch this category', err)
       } finally {
@@ -188,12 +194,12 @@ export default defineComponent({
     },
 
     addExpense () {
-      const id = this.$route.params.categoryId
-      this.$router.push(`/category/${id}/add-expense`)
+      const id = this.$route.params.categoryId || ''
+      this.$router.push(`/add-expense/${id}`)
     },
 
     viewExpense (id) {
-      this.$router.push(`/expense/${id}/`)
+      this.$router.push(`/expense/${id || ''}/`)
     },
 
     deleteExpense (id) {

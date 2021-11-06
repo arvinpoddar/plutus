@@ -167,7 +167,7 @@ export default defineComponent({
 
         // After successful API POST, send back to category page
         const id = this.$route.params.categoryId
-        this.$router.push(`/category/${id}`)
+        this.$router.push(`/category/${id || ''}`)
       } catch (err) {
         this.showError('Could not add expense', err)
       } finally {

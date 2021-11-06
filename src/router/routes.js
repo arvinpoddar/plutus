@@ -97,11 +97,12 @@ const routes = [
   },
 
   {
-    path: '/category/:categoryId',
+    path: '/category',
     name: 'viewCategory',
     component: () => import('layouts/CleanLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/ViewCategory.vue') }
+      { path: '', component: () => import('pages/ViewCategory.vue') },
+      { path: ':categoryId', component: () => import('pages/ViewCategory.vue') }
     ],
     meta: {
       requiresAuth: true
@@ -109,11 +110,12 @@ const routes = [
   },
 
   {
-    path: '/category/:categoryId/add-expense',
+    path: '/add-expense',
     name: 'addExpense',
     component: () => import('layouts/CleanLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/AddExpense.vue') }
+      { path: '', component: () => import('pages/AddExpense.vue') },
+      { path: ':categoryId', component: () => import('pages/AddExpense.vue') }
     ],
     meta: {
       requiresAuth: true

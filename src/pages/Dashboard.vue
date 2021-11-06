@@ -13,6 +13,13 @@
 
       <!-- CATEGORIES LIST -->
       <div v-else>
+        <div class="row pl-card category-card" @click="viewCategory('')">
+          <div class="col ellipsis">All Expenses</div>
+          <div>{{ numToDollar(totalExpenses) }}</div>
+        </div>
+
+        <q-separator inset class="q-my-lg" />
+
         <div
           v-for="cat in categories"
           :key="cat.id"
@@ -50,18 +57,33 @@ export default defineComponent({
   data () {
     return {
       categories: [],
+      allExpenses: [],
       loading: false
     }
   },
+  computed: {
+    totalExpenses () {
+      let sum = 0
+      this.allExpenses.forEach((expense) => {
+        sum += expense.price
+      })
+      return sum
+    }
+  },
   methods: {
+    async getExpenses () {
+      try {
+        this.allExpenses = (await this.$api.get('/expenses')).data
+      } catch (err) {
+        this.showError('Could not fetch your expenses', err)
+      }
+    },
+
     async getCategories () {
       try {
-        this.loading = true
         this.categories = (await this.$api.get('/categories')).data
       } catch (err) {
         this.showError('Could not fetch your categories', err)
-      } finally {
-        this.loading = false
       }
     },
 
@@ -83,8 +105,14 @@ export default defineComponent({
     }
   },
 
-  mounted () {
-    this.getCategories()
+  async mounted () {
+    try {
+      this.loading = true
+      await this.getCategories()
+      await this.getExpenses()
+    } finally {
+      this.loading = false
+    }
   }
 })
 </script>
