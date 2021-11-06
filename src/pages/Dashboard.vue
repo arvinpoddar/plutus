@@ -19,6 +19,14 @@
           <div class="chart-container" style="height: 125px">
             <FlatChart :expenses="allExpenses" />
           </div>
+          <q-btn
+            icon="add"
+            color="primary"
+            class="fab-btn"
+            round
+            size="xs"
+            @click.stop="addExpense('')"
+          />
         </div>
 
         <q-separator inset class="q-my-lg" />
@@ -33,8 +41,18 @@
             <div class="col ellipsis">{{ cat.name }}</div>
             <div>{{ numToDollar(cat.total_expenses) }}</div>
           </div>
-          <div class="chart-container" style="height: 75px">
-            <FlatChart :expenses="cat.expenses" />
+          <div class="row">
+            <div class="col chart-container" style="height: 75px">
+              <FlatChart :expenses="cat.expenses" />
+            </div>
+            <q-btn
+              icon="add"
+              color="primary"
+              class="fab-btn"
+              round
+              size="xs"
+              @click.stop="addExpense(cat.id)"
+            />
           </div>
         </div>
 
@@ -111,6 +129,10 @@ export default defineComponent({
       this.$router.push(`/category/${id}`)
     },
 
+    addExpense (id) {
+      this.$router.push(`/add-expense/${id}`)
+    },
+
     logout () {
       const auth = getAuth()
       signOut(auth)
@@ -146,6 +168,7 @@ export default defineComponent({
   }
 
   .category-card {
+    position: relative;
     padding: 12px 12px 0px 12px;
     cursor: pointer;
     margin-bottom: 24px;
@@ -154,6 +177,12 @@ export default defineComponent({
 
     .chart-container {
       width: 100%;
+    }
+
+    .fab-btn {
+      position: absolute;
+      right: 8px;
+      bottom: 8px;
     }
   }
 }

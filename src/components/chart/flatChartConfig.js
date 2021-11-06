@@ -21,7 +21,7 @@ export const flatChartOptions = {
     show: true,
     curve: 'smooth',
     lineCap: 'round',
-    colors: ['#785FFF'],
+    colors: ['#0058E3'],
     width: 4
   },
   fill: {
@@ -31,7 +31,7 @@ export const flatChartOptions = {
       type: 'horizontal',
       gradientToColors: ['#0058E3', '#0058E3'],
       shadeIntensity: 1,
-      opacityFrom: 0.5,
+      opacityFrom: 1,
       opacityTo: 1,
       stops: [0, 50, 100]
     }

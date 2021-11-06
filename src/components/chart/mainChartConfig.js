@@ -24,7 +24,7 @@ export const mainChartOptions = {
     show: true,
     curve: 'smooth',
     lineCap: 'round',
-    colors: ['#785FFF'],
+    colors: ['#0058E3'],
     width: 4
   },
   markers: {
