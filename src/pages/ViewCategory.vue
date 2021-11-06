@@ -32,9 +32,18 @@
       <PLFieldInput v-model="search" placeholder="Search..." class="q-mb-sm">
         <template v-slot:append>
           <q-icon name="pl:icon-schedule" class="cursor-pointer" @click="prompt = true">
-            <q-dialog v-model="prompt" persistent position="bottom">
+            <q-dialog v-model="prompt" position="bottom">
               <q-card style="min-width: 350px">
-                <q-card-section>
+                <div class = "dialog-header-box">
+                <!-- <q-card-actions class="text-primary">
+                   <div class="text-h6">Filter</div>
+        </q-card-actions> -->
+                <q-card-actions align="right" class="text-primary">
+                   <!-- <div class="text-h6">Filter</div> -->
+          <q-btn flat round icon="close" v-close-popup @click ="prompt = false"/>
+        </q-card-actions>
+        </div>
+                <q-card-section style = "margin: -40px">
                   <div class="q-pa-lg">
                     <q-option-group
                         v-model="dateChoice"
@@ -44,7 +53,13 @@
                 </div>
                 </q-card-section>
                 <q-card-section v-if="dateChoice=== 'dateRange'" class="q-pt-none">
-                   <q-list v-if="dateChoice=== 'dateRange'" class="q-py-md" style="min-width: 100px">
+                  <div id="q-app" style = "margin-top: -55px">
+                    <div class="q-pa-md">
+                      <!-- you can remove the header by adding minimal prompt -->
+                      <q-date v-model="model" range ></q-date>
+                     </div>
+                  </div>
+                   <!-- <q-list v-if="dateChoice=== 'dateRange'" class="q-py-md" style="min-width: 100px">
                 <q-item>
                   <q-item-section>
                     From:
@@ -65,12 +80,8 @@
                     @click="resetDateFilters"
                   />
                 </div>
-              </q-list>
+              </q-list> -->
                 </q-card-section>
-
-        <q-card-actions align="right" class="text-primary">
-          <q-icon name="close" v-close-popup size = "24px" />
-        </q-card-actions>
       </q-card>
             </q-dialog>
             <!-- <q-menu>
@@ -188,38 +199,18 @@ export default defineComponent({
       startDate: '',
       endDate: '',
       dateChoice: '',
-
+      model: ref({ from: '', to: '' }),
       loading: true
     }
   },
-  // setup () {
-  //   return {
-  //     group: this.ref('op1'),
-
-  //     options: [
-  //       {
-  //         label: 'Option 1',
-  //         value: 'op1'
-  //       },
-  //       {
-  //         label: 'Option 2',
-  //         value: 'op2'
-  //       },
-  //       {
-  //         label: 'Option 3',
-  //         value: 'op3'
-  //       }
-  //     ]
-  //   }
-  // },
   computed: {
     filteredByDate () {
       // Filter initial expense list by dates (if date filters are present)
       if (this.dateChoice === 'dateRange') {
-        const minDate = this.startDate
-          ? new Date(this.startDate)
+        const minDate = this.model.from
+          ? new Date(this.model.from)
           : new Date('1970-01-01')
-        const maxDate = this.endDate ? new Date(this.endDate) : new Date()
+        const maxDate = this.model.to ? new Date(this.model.to) : new Date()
 
         const expensesWithinDates = this.category.expenses.filter((expense) => {
           const expenseDate = new Date(expense.date)
@@ -391,5 +382,10 @@ export default defineComponent({
 .reset-button {
   padding: 0px 29px;
   height: 30px;
+}
+.dialog-header-box {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 </style>
