@@ -23,7 +23,11 @@
           />
         </div>
 
-        <ExpenseImages :images="expense.images" :expenseId="expense.id" />
+        <ExpenseImages
+          :images="expense.images"
+          @upload="addImageToExpense"
+          @delete="deleteImageFromExpense"
+        />
 
         <div class="q-gutter-y-md">
           <PLFieldInput v-model="expense.description" field="Description" />
@@ -230,6 +234,14 @@ export default defineComponent({
             this.saving = false
           }
         })
+    },
+
+    addImageToExpense (url) {
+      this.expense.images.push(url)
+    },
+
+    deleteImageFromExpense (url) {
+      this.expense.images = this.expense.images.filter((img) => img !== url)
     },
 
     goBack () {

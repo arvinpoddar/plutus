@@ -33,7 +33,7 @@
         <template v-slot:append>
           <q-icon name="pl:icon-schedule" class="cursor-pointer">
             <q-menu>
-              <q-list class="q-py-md" style="min-width: 100px">
+              <q-list class="q-py-md" style="min-width: 200px">
                 <q-item>
                   <q-item-section>
                     From:
