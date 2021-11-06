@@ -33,12 +33,19 @@
         <EmptyCard v-if="!categories.length" message="No categories!" />
       </div>
     </div>
-    <div class="fixed-controls">
+    <div class="fixed-controls row q-gutter-x-md">
       <q-btn
-        class="pl-btn full-width q-mb-md"
+        class="pl-btn col q-mb-md"
         label="Add Category"
         color="primary"
         text-color="white"
+      />
+      <q-btn
+        class="pl-btn-icn col q-mb-md"
+        label="Add Expense"
+        color="primary"
+        text-color="white"
+        to="/add-expense"
       />
     </div>
   </q-page>
