@@ -24,7 +24,7 @@
           Total: {{ numToDollar(totalExpenses) }}
         </div>
         <div class="chart-container" style="height: 200px">
-          <MainChart :expenses="category.expenses" />
+          <MainChart :expenses="searchResults" />
         </div>
       </div>
 
@@ -175,7 +175,7 @@ export default defineComponent({
 
     totalExpenses () {
       let sum = 0
-      this.category.expenses.forEach((expense) => {
+      this.searchResults.forEach((expense) => {
         sum += expense.price
       })
       return sum
