@@ -1,6 +1,6 @@
 <template>
   <Loader v-if="loading" />
-  <q-page class="category-layout" v-else>
+  <q-page class="category-layout fixed-layout" v-else>
     <q-form @submit="saveExpense">
       <div
         class="q-px-lg q-py-xl flex column full-width"
@@ -22,6 +22,8 @@
             required
           />
         </div>
+
+        <ExpenseImages :images="expense.images" :expenseId="expense.id" />
 
         <div class="q-gutter-y-md">
           <PLFieldInput v-model="expense.description" field="Description" />
@@ -127,18 +129,25 @@ import dayjs from 'dayjs'
 import notify from 'src/components/mixins/notify'
 import format from 'src/components/mixins/format'
 
+import ExpenseImages from 'src/components/images/ExpenseImages'
+
 export default defineComponent({
   name: 'PageViewExpense',
   mixins: [notify, format],
+  components: {
+    ExpenseImages
+  },
   data () {
     return {
       expense: {
+        id: '',
         name: '',
         description: '',
         date: dayjs().format('YYYY-MM-DD'),
         price: 0,
         categories: [],
-        payment_method: ''
+        payment_method: '',
+        images: []
       },
 
       categoryBuffer: [],
