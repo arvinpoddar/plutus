@@ -118,7 +118,7 @@ function numToDollar (amount, toInteger = false) {
 }
 
 function tooltipFactory (time, amount) {
-  const date = dayjs(time).add(1, 'days').format('M/D')
+  const date = dayjs(time).add(1, 'days').format('MMM d')
   return `<div class="ts-tooltip">
         <div class="ts-tooltip-title">${numToDollar(amount)}</div>
         <div class="ts-tooltip-subtitle">${date}</div>
