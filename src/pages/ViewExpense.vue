@@ -1,5 +1,6 @@
 <template>
-  <q-page class="category-layout">
+  <Loader v-if="loading" />
+  <q-page class="category-layout" v-else>
     <q-form @submit="saveExpense">
       <div
         class="q-px-lg q-py-xl flex column full-width"
@@ -103,7 +104,7 @@
             label="Delete"
             color="negative"
             text-color="white"
-            :loading="loading"
+            :loading="saving"
             @click="deleteExpense"
           />
           <q-btn
@@ -111,7 +112,7 @@
             label="Save"
             color="primary"
             text-color="white"
-            :loading="loading"
+            :loading="saving"
             type="submit"
           />
         </div>
@@ -145,7 +146,8 @@ export default defineComponent({
       categoryOptions: [],
       methodOptions: [],
 
-      loading: false
+      loading: true,
+      saving: false
     }
   },
   methods: {
@@ -163,6 +165,7 @@ export default defineComponent({
     async getExpense () {
       try {
         // Fetch current expense
+        this.loading = true
         const id = this.$route.params.expenseId
         this.expense = (await this.$api.get(`/expenses/${id}`)).data
         this.expense.date = this.formatDate(this.expense.date, 'YYYY-MM-DD')
@@ -171,12 +174,14 @@ export default defineComponent({
         })
       } catch (err) {
         this.showError('Could not fetch expense', err)
+      } finally {
+        this.loading = false
       }
     },
 
     async saveExpense () {
       try {
-        this.loading = true
+        this.saving = true
         const selectedCategories = this.categoryBuffer.map((cat) => cat.id)
         if (!selectedCategories.length) {
           return this.showError('Add a category for your expense', null)
@@ -192,7 +197,7 @@ export default defineComponent({
       } catch (err) {
         this.showError('Could not save expense', err)
       } finally {
-        this.loading = false
+        this.saving = false
       }
     },
 
@@ -205,7 +210,7 @@ export default defineComponent({
         })
         .onOk(async () => {
           try {
-            this.loading = true
+            this.saving = true
             const id = this.$route.params.expenseId
             await this.$api.delete(`/expenses/${id}`)
             // After successful API POST, send back to view category page
@@ -213,7 +218,7 @@ export default defineComponent({
           } catch (err) {
             this.showError('Could not delete expense', err)
           } finally {
-            this.loading = false
+            this.saving = false
           }
         })
     },

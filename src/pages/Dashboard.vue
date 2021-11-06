@@ -9,18 +9,22 @@
         <q-btn icon="logout" color="black" flat dense @click="logout" />
       </div>
 
-      <!-- CATEGORIES LIST -->
-      <div
-        v-for="cat in categories"
-        :key="cat.id"
-        class="row pl-card category-card"
-        @click="viewCategory(cat.id)"
-      >
-        <div class="col ellipsis">{{ cat.name }}</div>
-        <div>{{ numToDollar(cat.total_expenses) }}</div>
-      </div>
+      <Loader v-if="loading" />
 
-      <EmptyCard v-if="!categories.length" message="No categories!" />
+      <!-- CATEGORIES LIST -->
+      <div v-else>
+        <div
+          v-for="cat in categories"
+          :key="cat.id"
+          class="row pl-card category-card"
+          @click="viewCategory(cat.id)"
+        >
+          <div class="col ellipsis">{{ cat.name }}</div>
+          <div>{{ numToDollar(cat.total_expenses) }}</div>
+        </div>
+
+        <EmptyCard v-if="!categories.length" message="No categories!" />
+      </div>
     </div>
     <div class="fixed-controls">
       <q-btn
@@ -45,7 +49,8 @@ export default defineComponent({
   mixins: [notify, format],
   data () {
     return {
-      categories: []
+      categories: [],
+      loading: false
     }
   },
   methods: {

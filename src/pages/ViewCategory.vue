@@ -1,5 +1,6 @@
 <template>
-  <q-page class="category-layout">
+  <Loader v-if="loading" />
+  <q-page class="category-layout" v-else>
     <div
       class="q-px-lg q-py-xl flex column full-width"
       style="min-height: 100vh"
@@ -112,7 +113,9 @@ export default defineComponent({
 
       search: '',
       startDate: '',
-      endDate: ''
+      endDate: '',
+
+      loading: true
     }
   },
   computed: {
