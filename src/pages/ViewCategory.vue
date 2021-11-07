@@ -31,98 +31,17 @@
       <!-- SEARCH BAR -->
       <PLFieldInput v-model="search" placeholder="Search..." class="q-mb-sm">
         <template v-slot:append>
-          <q-icon name="pl:icon-schedule" class="cursor-pointer" @click="prompt = true">
-            <q-dialog v-model="prompt" position="bottom">
-              <q-card style="min-width: 350px">
-                <div class = "dialog-header-box">
-                <!-- <q-card-actions class="text-primary">
-                   <div class="text-h6">Filter</div>
-        </q-card-actions> -->
-                <q-card-actions align="right" class="text-primary">
-                   <!-- <div class="text-h6">Filter</div> -->
-          <q-btn flat round icon="close" v-close-popup @click ="prompt = false"/>
-        </q-card-actions>
-        </div>
-                <q-card-section style = "margin: -40px">
-                  <div class="q-pa-lg">
-                    <q-option-group
-                        v-model="dateChoice"
-                        :options="options"
-                        color="primary"
-                    />
-                </div>
-                </q-card-section>
-                <q-card-section v-if="dateChoice=== 'dateRange'" class="q-pt-none">
-                  <div id="q-app" style = "margin-top: -55px">
-                    <div class="q-pa-md">
-                      <!-- you can remove the header by adding minimal prompt -->
-                      <q-date v-model="model" range ></q-date>
-                     </div>
-                  </div>
-                   <!-- <q-list v-if="dateChoice=== 'dateRange'" class="q-py-md" style="min-width: 100px">
-                <q-item>
-                  <q-item-section>
-                    From:
-                    <PLFieldInput type="date" v-model="startDate" />
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    To:
-                    <PLFieldInput type="date" v-model="endDate" />
-                  </q-item-section>
-                </q-item>
-                <div class="row justify-end">
-                  <q-btn
-                    label="Reset"
-                    color="negative"
-                    class="pl-btn q-mr-md q-mt-sm reset-button"
-                    @click="resetDateFilters"
-                  />
-                </div>
-              </q-list> -->
-                </q-card-section>
-      </q-card>
-            </q-dialog>
-            <!-- <q-menu>
-                  <div class="q-pa-lg">
-                    <q-option-group
-                        v-model="dateChoice"
-                        :options="options"
-                        color="primary"
-                    />
-                </div>
-              <q-list v-if="dateChoice=== 'dateRange'" class="q-py-md" style="min-width: 100px">
-                <q-item>
-                  <q-item-section>
-                    From:
-                    <PLFieldInput type="date" v-model="startDate" />
-                  </q-item-section>
-                </q-item>
-                <q-item>
-                  <q-item-section>
-                    To:
-                    <PLFieldInput type="date" v-model="endDate" />
-                  </q-item-section>
-                </q-item>
-                <div class="row justify-end">
-                  <q-btn
-                    label="Reset"
-                    color="negative"
-                    class="pl-btn q-mr-md q-mt-sm reset-button"
-                    @click="resetDateFilters"
-                  />
-                </div>
-              </q-list>
-            </q-menu> -->
-
-          </q-icon>
+          <q-icon
+            name="pl:icon-schedule"
+            class="cursor-pointer"
+            @click="showDateFilters = true"
+          />
         </template>
       </PLFieldInput>
 
       <q-slide-item
         v-for="expense in searchResults"
-        :key="expense.id + startDate"
+        :key="expense.id"
         @right="deleteExpense(expense.id)"
         @click="viewExpense(expense.id)"
         right-color="negative"
@@ -157,15 +76,64 @@
       />
     </div>
   </q-page>
+
+  <!-- DATE FILTER DIALOG -->
+  <q-dialog v-model="showDateFilters" position="bottom">
+    <q-card>
+      <div class="q-px-sm q-pt-md">
+        <q-option-group
+          v-model="dateRangeChoice"
+          :options="dateRangeOptions"
+          color="primary"
+        />
+        <div v-if="dateRangeChoice === 'custom'" class="q-px-md q-mt-sm">
+          <q-date
+            range
+            v-model="dateRange"
+            class="full-width q-mb-md pl-date-picker"
+            minimal
+            flat
+          />
+        </div>
+        <div class="row justify-end q-px-md">
+          <q-btn
+            class="pl-btn reset-button q-mb-md"
+            label="Close"
+            color="primary"
+            v-close-popup
+          />
+        </div>
+      </div>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script>
-import { defineComponent, ref } from 'vue'
-import { date } from 'quasar'
+import { defineComponent } from 'vue'
+import dayjs from 'dayjs'
 import notify from 'src/components/mixins/notify'
 import format from 'src/components/mixins/format'
 
 import MainChart from 'src/components/chart/MainChart'
+
+const dateRangeOptions = [
+  {
+    label: 'Show all',
+    value: 'all'
+  },
+  {
+    label: 'Last 7 days',
+    value: 'week'
+  },
+  {
+    label: 'This month',
+    value: 'month'
+  },
+  {
+    label: 'Custom',
+    value: 'custom'
+  }
+]
 
 export default defineComponent({
   name: 'PageViewCategory',
@@ -179,71 +147,48 @@ export default defineComponent({
         name: '',
         expenses: []
       },
-      options: [
-        {
-          label: 'Previous 7 days',
-          value: 'week'
-        },
-        {
-          label: 'This month',
-          value: 'month'
-        },
-        {
-          label: 'Date Range',
-          value: 'dateRange'
-        }
-      ],
-      prompt: ref(false),
 
       search: '',
-      startDate: '',
-      endDate: '',
-      dateChoice: '',
-      model: ref({ from: '', to: '' }),
+
+      showDateFilters: false,
+      dateRangeOptions,
+      dateRangeChoice: 'all',
+      dateRange: {
+        from: '',
+        to: ''
+      },
+
       loading: true
     }
   },
   computed: {
     filteredByDate () {
       // Filter initial expense list by dates (if date filters are present)
-      if (this.dateChoice === 'dateRange') {
-        const minDate = this.model.from
-          ? new Date(this.model.from)
-          : new Date('1970-01-01')
-        const maxDate = this.model.to ? new Date(this.model.to) : new Date()
 
-        const expensesWithinDates = this.category.expenses.filter((expense) => {
-          const expenseDate = new Date(expense.date)
-          return expenseDate >= minDate && expenseDate <= maxDate
-        })
-        return expensesWithinDates
-      } else if (this.dateChoice === 'week') {
-        const maxDate = Date.now()
-        const minDate = date.subtractFromDate(maxDate, { days: 7 })
-        const expensesWithinDates = this.category.expenses.filter((expense) => {
-          const expenseDate = new Date(expense.date)
-          return expenseDate >= minDate && expenseDate <= maxDate
-        })
-        return expensesWithinDates
-      } else if (this.dateChoice === 'month') {
-        const currDate = Date.now()
-        const expensesWithinDates = this.category.expenses.filter((expense) => {
-          const expenseDate = new Date(expense.date)
-          return date.isSameDate(expenseDate, currDate, 'month')
-        })
-        return expensesWithinDates
+      let minDate = null
+      let maxDate = null
+
+      if (this.dateRangeChoice === 'all') {
+        return [...this.category.expenses]
+      } else if (this.dateRangeChoice === 'custom') {
+        minDate = this.dateRange.from
+          ? new Date(this.dateRange.from)
+          : new Date('1970-01-01')
+        maxDate = this.dateRange.to ? new Date(this.dateRange.to) : new Date()
+      } else if (this.dateRangeChoice === 'week') {
+        maxDate = dayjs().toDate()
+        minDate = dayjs().subtract(7, 'day').toDate()
+      } else if (this.dateRangeChoice === 'month') {
+        maxDate = dayjs().toDate()
+        minDate = dayjs().subtract(1, 'month').toDate()
       }
 
-      // const minDate = this.startDate
-      //   ? new Date(this.startDate)
-      //   : new Date('1970-01-01')
-      // const maxDate = this.endDate ? new Date(this.endDate) : new Date()
+      const expensesWithinDates = this.category.expenses.filter((expense) => {
+        const expenseDate = new Date(expense.date)
+        return expenseDate >= minDate && expenseDate <= maxDate
+      })
 
-      // const expensesWithinDates = this.category.expenses.filter((expense) => {
-      //   const expenseDate = new Date(expense.date)
-      //   return expenseDate >= minDate && expenseDate <= maxDate
-      // })
-      return this.category.expenses
+      return expensesWithinDates
     },
 
     searchResults () {
@@ -340,8 +285,10 @@ export default defineComponent({
     },
 
     resetDateFilters () {
-      this.startDate = ''
-      this.endDate = ''
+      this.dateRange = {
+        from: '',
+        to: ''
+      }
     }
   },
 
@@ -383,9 +330,9 @@ export default defineComponent({
   padding: 0px 29px;
   height: 30px;
 }
-.dialog-header-box {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
+
+.pl-date-picker {
+  border: 2px solid #785fff;
+  border-radius: 10px;
 }
 </style>
