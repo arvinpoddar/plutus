@@ -29,5 +29,8 @@
       "ios",
       "android"
     ]
+  },
+  "dependencies": {
+    "apexcharts": "^3.29.0"
   }
 }
