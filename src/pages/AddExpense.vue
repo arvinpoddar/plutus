@@ -18,6 +18,27 @@
           <div class="col ellipsis header">Add Expense</div>
         </div>
 
+        <div class="row items-center q-gutter-x-md q-mb-lg">
+          <q-btn
+            icon="pl:icon-photos"
+            class="col pl-btn-icn"
+            label="Add image"
+            color="primary"
+            text-color="white"
+            :loading="loading"
+            @click="addImageFromLibrary"
+          />
+          <q-btn
+            icon="pl:icon-file"
+            class="col pl-btn-icn"
+            label="Add receipt"
+            color="primary"
+            text-color="white"
+            :loading="loading"
+            @click="addReceipt"
+          />
+        </div>
+
         <ExpenseImages
           :images="res.images"
           @upload="addImageToExpense"
@@ -117,6 +138,7 @@
 import { defineComponent } from 'vue'
 import dayjs from 'dayjs'
 import notify from 'src/components/mixins/notify'
+// import uploadImage from 'src/components/mixins/uploadImage'
 
 import ExpenseImages from 'src/components/images/ExpenseImages'
 
@@ -196,7 +218,75 @@ export default defineComponent({
 
     deleteImageFromExpense (url) {
       this.res.images = this.res.images.filter((img) => img !== url)
+    },
+
+    pickPhoto () {
+      return new Promise((resolve, reject) => {
+        navigator.camera.getPicture(
+          (data) => {
+            resolve(`data:image/jpeg;base64,${data}`)
+          },
+          (err) => {
+            reject(err)
+          },
+          {
+            quality: 30,
+            destinationType: navigator.camera.DestinationType.DATA_URL,
+            encodingType: navigator.camera.EncodingType.JPEG,
+            MEDIATYPE: navigator.camera.MediaType.PICTURE,
+            sourceType: navigator.camera.PictureSourceType.PHOTOLIBRARY,
+            mediaType: navigator.camera.MediaType.PICTURE,
+            cameraDirection: navigator.camera.Direction.BACK
+          }
+        )
+      })
+    },
+
+    async addImageFromLibrary () {
+      try {
+        const photo = await this.pickPhoto()
+        this.loading = true
+        const res = (
+          await this.$api.post('/images', {
+            base64: photo
+          })
+        ).data
+        this.addImageToExpense(res.url)
+      } catch (err) {
+        this.showError(err, 'Could not upload image')
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async addReceipt () {
+      try {
+        const receipt = await this.pickPhoto()
+        this.loading = true
+        const res = (
+          await this.$api.post('/receipts', {
+            base64: receipt
+          })
+        ).data
+        console.log(res)
+        this.addImageToExpense(res.url)
+        const receiptData = res.receipt_data
+
+        // AUTOFILL USING RECEIPT DATA
+        this.name = receiptData.merchant_name || ''
+        if (receiptData.items && receiptData.items.length) {
+          const items = receiptData.items.map(item => item.description)
+          this.description = items.join(',')
+        }
+        this.date = receiptData.date || dayjs().format('YYYY-MM-DD')
+        this.price = receiptData.total
+      } catch (err) {
+        this.showError(err, 'Could not upload receipt')
+      } finally {
+        this.loading = false
+      }
     }
+
   },
 
   mounted () {

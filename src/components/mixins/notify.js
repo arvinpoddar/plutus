@@ -22,7 +22,7 @@ export const notify = {
       this.$q.notify({
         type: 'negative',
         progress: true,
-        message: message,
+        message: message || 'Something went wrong',
         position: 'top',
         timeout: 1500,
         classes: 'pl-notification',
