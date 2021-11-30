@@ -268,18 +268,17 @@ export default defineComponent({
             base64: receipt
           })
         ).data
-        console.log(res)
         this.addImageToExpense(res.url)
         const receiptData = res.receipt_data
 
         // AUTOFILL USING RECEIPT DATA
-        this.name = receiptData.merchant_name || ''
+        this.res.name = receiptData.merchant_name || this.res.name
         if (receiptData.items && receiptData.items.length) {
           const items = receiptData.items.map(item => item.description)
-          this.description = items.join(',')
+          this.res.description = items.join(',')
         }
-        this.date = receiptData.date || dayjs().format('YYYY-MM-DD')
-        this.price = receiptData.total
+        this.res.date = receiptData.date || this.res.date
+        this.res.price = receiptData.total || this.res.price
       } catch (err) {
         this.showError(err, 'Could not upload receipt')
       } finally {
