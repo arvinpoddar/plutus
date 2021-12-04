@@ -275,7 +275,7 @@ export default defineComponent({
         this.res.name = receiptData.merchant_name || this.res.name
         if (receiptData.items && receiptData.items.length) {
           const items = receiptData.items.map(item => item.description)
-          this.res.description = items.join(',')
+          this.res.description = items.join(', ')
         }
         this.res.date = receiptData.date || this.res.date
         this.res.price = receiptData.total || this.res.price

@@ -134,6 +134,18 @@ const routes = [
     }
   },
 
+  {
+    path: '/export',
+    name: 'export',
+    component: () => import('layouts/CleanLayout.vue'),
+    children: [
+      { path: '', component: () => import('pages/Export.vue') }
+    ],
+    meta: {
+      requiresAuth: true
+    }
+  },
+
   // Always leave this as last one,
   // but you can also remove it
   {

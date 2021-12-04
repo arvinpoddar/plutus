@@ -61,10 +61,11 @@
     </div>
     <div class="fixed-controls row q-gutter-x-md">
       <q-btn
-        class="pl-btn col q-mb-md"
-        label="Add Category"
+        class="pl-btn q-mb-md"
+        label="Export"
         color="primary"
         text-color="white"
+        to="/export"
       />
       <q-btn
         class="pl-btn-icn col q-mb-md"
