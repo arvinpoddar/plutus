@@ -18,7 +18,9 @@
           <div class="col ellipsis header">Export</div>
         </div>
 
-        <div class="q-gutter-y-md">
+        <Loader v-if="loading" />
+
+        <div class="q-gutter-y-md" v-else>
           <!-- SELECT DATES -->
           <div class="pl-stack-input">
             <div class="sl-label">Dates</div>
@@ -117,6 +119,10 @@
               </template>
             </q-select>
           </div>
+
+          <div class="f-18 text-grey">
+            {{ filteredExpenses.length }} matching expenses
+          </div>
         </div>
       </div>
 
@@ -126,7 +132,7 @@
           label="Export"
           color="primary"
           text-color="white"
-          :loading="loading"
+          :loading="exporting"
           type="submit"
         />
       </div>
@@ -154,6 +160,7 @@ export default defineComponent({
   data () {
     return {
       range: 'all',
+      expenses: [],
       categories: [],
       methods: [],
 
@@ -167,7 +174,8 @@ export default defineComponent({
         to: ''
       },
 
-      loading: false
+      loading: false,
+      exporting: false
     }
   },
   computed: {
@@ -189,11 +197,40 @@ export default defineComponent({
         range.max = dayjs(this.customRange.to)
       }
       return range
+    },
+
+    filteredExpenses () {
+      const categorySelection = this.categories.map((cat) => cat.id)
+      const methodSelection = this.methods.map((method) => method.id)
+
+      return this.expenses.filter((expense) => {
+        // CHECK CATEGORY IS IN SELECTION
+        for (const category of expense.categories) {
+          if (!categorySelection.includes(category)) {
+            return false
+          }
+        }
+
+        // CHECK PAYMENT METHOD IS IN SELECTION
+        if (!methodSelection.includes(expense.payment_method)) {
+          return false
+        }
+
+        // CHECK EXPENSE DATE IN RANGE
+        const minDate = this.dateRange.min.toISOString()
+        const maxDate = this.dateRange.max.toISOString()
+        if (!(expense.date >= minDate && expense.date <= maxDate)) {
+          return false
+        }
+        return true
+      })
     }
   },
   methods: {
     async getOptions () {
       try {
+        this.loading = true
+        this.expenses = (await this.$api.get('/expenses')).data
         // Fetch all categories and automatically add the current one (if it is valid)
         this.categoryOptions = (await this.$api.get('/categories')).data
         this.categories = [...this.categoryOptions]
@@ -203,6 +240,8 @@ export default defineComponent({
         this.methods = [...this.methodOptions]
       } catch (err) {
         this.showError('Could not fetch user data', err)
+      } finally {
+        this.loading = false
       }
     },
 
@@ -212,40 +251,13 @@ export default defineComponent({
 
     async exportData () {
       try {
-        this.loading = true
-        const expenses = (await this.$api.get('/expenses')).data
+        this.exporting = true
 
-        const categorySelection = this.categories.map((cat) => cat.id)
-        const methodSelection = this.methods.map((method) => method.id)
-
-        // FILTER EXPENSES TO EXPORT
-        const filteredExpenses = expenses.filter((expense) => {
-          // CHECK CATEGORY IS IN SELECTION
-          for (const category of expense.categories) {
-            if (!categorySelection.includes(category)) {
-              return false
-            }
-          }
-
-          // CHECK PAYMENT METHOD IS IN SELECTION
-          if (!methodSelection.includes(expense.payment_method)) {
-            return false
-          }
-
-          // CHECK EXPENSE DATE IN RANGE
-          const minDate = this.dateRange.min.toISOString()
-          const maxDate = this.dateRange.max.toISOString()
-          if (!(expense.date >= minDate && expense.date <= maxDate)) {
-            return false
-          }
-          return true
-        })
-
-        if (!filteredExpenses.length) {
+        if (!this.filteredExpenses.length) {
           return this.showError('There are no expenses to export', null)
         }
 
-        const csvContent = this.createCSVFromExpenses(filteredExpenses)
+        const csvContent = this.createCSVFromExpenses(this.filteredExpenses)
 
         // UPLOAD FILE, GET BACK URL
         const res = await this.$api.post('/exports', {
@@ -260,7 +272,7 @@ export default defineComponent({
       } catch (err) {
         this.showError('Could not export your data', err)
       } finally {
-        this.loading = false
+        this.exporting = false
       }
     },
 
