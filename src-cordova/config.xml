@@ -20,6 +20,9 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
         <preference name="ScrollEnabled" value="true" />
+        <preference name="StatusBarBackgroundColor" value="#f9f9fa" />
+        <preference name="StatusBarOverlaysWebView" value="false" />
+        <preference name="StatusBarStyle" value="default" />
         <edit-config file="*-Info.plist" mode="merge" target="NSCameraUsageDescription">
             <string>need camera access to take pictures</string>
         </edit-config>

@@ -3,7 +3,7 @@
   <q-page class="category-layout fixed-layout" v-else>
     <q-form @submit="saveExpense">
       <div
-        class="q-px-lg q-py-xl flex column full-width"
+        class="q-px-lg q-py-lg flex column full-width"
         style="min-height: 100vh"
       >
         <div class="row q-mb-md">

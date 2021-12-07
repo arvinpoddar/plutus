@@ -1,7 +1,7 @@
 <template>
   <q-page class="onboard-payments-layout">
     <div
-      class="q-px-lg q-py-xl flex column full-width"
+      class="q-px-lg q-py-lg flex column full-width"
       style="min-height: 100vh"
     >
       <div class="header">Payment Types</div>

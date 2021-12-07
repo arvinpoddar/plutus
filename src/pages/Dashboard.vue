@@ -1,7 +1,7 @@
 <template>
   <q-page class="dashboard-layout fixed-layout">
     <div
-      class="q-px-lg q-py-xl flex column full-width"
+      class="q-px-lg q-py-lg flex column full-width"
       style="min-height: 100vh"
     >
       <div class="row q-mb-md">
