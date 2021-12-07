@@ -33,7 +33,7 @@ export const uploadImage = {
         this.$emit(UPLOAD_EVENT, res.url)
         return res.url
       } catch (err) {
-        this.showError(err, 'Could not upload image')
+        this.showError('Could not upload image', err)
       } finally {
         this.loading = false
       }

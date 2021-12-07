@@ -253,7 +253,7 @@ export default defineComponent({
         ).data
         this.addImageToExpense(res.url)
       } catch (err) {
-        this.showError(err, 'Could not upload image')
+        this.showError('Could not upload image', err)
       } finally {
         this.loading = false
       }
@@ -268,24 +268,26 @@ export default defineComponent({
             base64: receipt
           })
         ).data
-        this.addImageToExpense(res.url)
+
         const receiptData = res.receipt_data
 
-        // AUTOFILL USING RECEIPT DATA
-        this.res.name = receiptData.merchant_name || this.res.name
-        if (receiptData.items && receiptData.items.length) {
-          const items = receiptData.items.map(item => item.description)
-          this.res.description = items.join(', ')
+        if (receiptData) {
+          // AUTOFILL USING RECEIPT DATA
+          this.addImageToExpense(res.url)
+          this.res.name = receiptData.merchant_name || this.res.name
+          if (receiptData.items && receiptData.items.length) {
+            const items = receiptData.items.map((item) => item.description)
+            this.res.description = items.join(', ')
+          }
+          this.res.date = receiptData.date || this.res.date
+          this.res.price = receiptData.total || this.res.price
         }
-        this.res.date = receiptData.date || this.res.date
-        this.res.price = receiptData.total || this.res.price
       } catch (err) {
-        this.showError(err, 'Could not upload receipt')
+        this.showError('Could not upload receipt', err)
       } finally {
         this.loading = false
       }
     }
-
   },
 
   mounted () {
